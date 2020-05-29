@@ -7,15 +7,13 @@ exports.default = function (context) {
         const appPath = context.appOutDir + '/' + context.packager.appInfo.productFilename + '.app';
         const configuration = fs.readFileSync('electron-builder.yml', 'utf-8');
         const appBundleId = (/^appId:\s(.*)\s/m.exec(configuration) || [ '', '' ])[1];
-        const idResult = child_process.spawnSync('/usr/bin/security', [ 'find-generic-password', '-s', appBundleId, '-g' ], { encoding: 'utf-8' });
-        const id = idResult.status === 0 ? (/"acct"<blob>="(.*)"/.exec(idResult.stdout) || [ '', ''])[1] : '';
-        const passwordResult = child_process.spawnSync('/usr/bin/security', [ 'find-generic-password', '-s', appBundleId, '-w' ], { encoding: 'utf-8' });
-        const password = passwordResult.status == 0 ? passwordResult.stdout.split('\n').shift() : '';
+        const appleApiKey = process.env.API_KEY_ID;
+        const appleApiIssuer = process.env.API_KEY_ISSUER_ID;
         return notarize.notarize({
             appBundleId: appBundleId,
             appPath: appPath,
-            appleId: id,
-            appleIdPassword: password,
+            appleApiKey: appleApiKey,
+            appleApiIssuer: appleApiIssuer,
         });
     }
 };
